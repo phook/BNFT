@@ -8,6 +8,14 @@ About BNFT
 BNFT is a tool for extraction information from text, checking against a BNF grammar (Backus-Naur-Form) and transform text into another text.
 BNFT is pronounced B’ N’ F’ it, or Benefit and the abbreviation stands for Backus Naur Form Transformer. This document is not a tutorial or BNF or EBNF and familiarity with these subject are assumed.
 
+BNFT Testbed
+------------
+
+Try out BNFT [here](http://phook.dk/BNFT/BNFT Testbed.html)
+
+For now availabe examples are Brainfuck and Turtle. An example in the works is the BNFT compiler which will take a BNFT spec and create a dedicated compiler for your language (and it will be able to compile itself :-)
+
+
 The BNFT specification
 ----------------------
 The BNFT specification holds the transformation code, written in a modified EBNF form.
