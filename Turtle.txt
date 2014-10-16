@@ -1,0 +1,1 @@
+The turtle example takes a simple turle syntax and translates it to javascript whichs opens a window with elements drawing the result of the program. Rather inefficient, but a quick hack.

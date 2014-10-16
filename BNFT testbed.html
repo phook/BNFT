@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>BNFT testbed</title>
+	<meta name="generator" content="BBEdit 10.1" />
+</head>
+<body>
+<script language="javascript" type="text/javascript" src="BNFT.js">
+</script>
+<form name="myForm">
+<table>
+<tr>
+<td>
+<select name="selector" onchange="Update(this.value)">
+</select>
+</td>
+</tr>
+<tr>
+<button type="button" onclick="DoIt()">Interpret code through BNFT</button>
+<button type="button" onclick="RunIt()">Run resulting code</button>
+</tr>
+<tr>
+</tr>
+<th>
+BNFT Code
+</th>
+<th>
+Code to Interpret
+</th>
+<th>
+Result
+</th>
+<tr>
+<td>
+<textarea name="BNFTcode" rows="20" cols="50"  wrap="off" style="font-family:courier">
+</textarea>
+</td>
+<td>
+<textarea name="code" rows="20"  cols="50" wrap="off" style="font-family:courier">
+</textarea>
+</td>
+<td>
+<textarea name="result" rows="20"  cols="50" wrap="off" style="font-family:courier">
+</textarea>
+</td>
+</tr>
+<tr>
+<th colspan="3">
+Console
+</th>
+</tr>
+<tr>
+<td colspan="3">
+<textarea name="console" rows="5"  cols="150" wrap="on" style="font-family:courier">
+</textarea>
+</td>
+</tr>
+</table>
+</form>
+
+<script language="javascript" type="text/javascript">
+
+	var examples = [
+				{"Name" : "Brainfuck Example", "BNFTfile" : "brainfuck.BNFT", "Codefile" : "brainfuck.code", "Consolefile" : "brainfuck.txt", "Runnable" : true},
+				{"Name" : "Turtle Example", "BNFTfile" : "turtle.BNFT", "Codefile" : "turtle.code", "Consolefile" : "turtle.txt", "Runnable" : true}
+                     ];
+
+	var sel = document.myForm.selector;
+	for (var i = 0; i < examples.length; i++) 
+	{
+    		var current = examples[i];
+    		var opt=document.createElement('option');
+
+    		opt.value = i;
+    		opt.textContent = current.Name;
+
+    		sel.appendChild(opt);
+	}
+
+	function LoadIt(src,dst)
+	{    
+		function reqListener () 
+		{
+	      	document.myForm[dst].value = this.responseText;
+    		}
+
+	    	var oReq = new XMLHttpRequest();
+    		oReq.onload = reqListener;
+    		oReq.open("get", src, true);
+    		oReq.send();
+	}
+
+	function DoIt()
+	{
+		var bnft = new BNFT(document.myForm.BNFTcode.value);
+		var code  = document.myForm.code.value;
+		document.myForm.result.value= bnft.parse(code);
+	}
+
+	function RunIt()
+	{
+		var code  = document.myForm.result.value;
+		eval(code);
+	}
+
+	function Update(no)
+	{
+		LoadIt(examples[no].BNFTfile,"BNFTcode");
+		LoadIt(examples[no].Codefile,"code");
+		LoadIt(examples[no].Consolefile,"console");
+	      document.myForm["result"].value = "";
+	}
+
+	Update(0);
+</script>
+</body>
+</html>

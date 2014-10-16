@@ -1,0 +1,21 @@
+def circle
+ do 10
+  forward 20
+  left 36
+ end
+end
+
+def flower
+ do 36
+  call circle
+  left 10
+ end
+end
+
+do 12
+ call flower
+ penup
+ left 45
+ forward 100
+ pendown
+end
