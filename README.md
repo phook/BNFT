@@ -77,69 +77,69 @@ The Syntax BNF for the .BNFT file
 =================================
 ```
 alpha_char:
-"A".."Z"
-"a".."z"
+ "A".."Z"
+ "a".."z"
 numeric_char:
-"0".."9"
+ "0".."9"
 hexadecimal_char:
-numeric_char
-"A".."F"
-"a".."f"
+ numeric_char
+ "A".."F"
+ "a".."f"
 alphanumeric_char:
-numeric_char
-alpha_char
+ numeric_char
+ alpha_char
 any_char:
-"\\t"
-"\\r"
-"\\n"
-"\\\\"
-"\\\""
-"\\\’"
-"#".."+"
-" " | "!"
-"(".."\0xFFFF"
-"\\0x" hexadecimal_char
-"\\0x" hexadecimal_char hexadecimal_char hexadecimal_char hexadecimal_char
+ "\\t"
+ "\\r"
+ "\\n"
+ "\\\\"
+ "\\\""
+ "\\\’"
+ "#".."+"
+ " " | "!"
+ "(".."\0xFFFF"
+ "\\0x" hexadecimal_char
+ "\\0x" hexadecimal_char hexadecimal_char hexadecimal_char hexadecimal_char
 whitespace:
-" "
-"\t"
+ " "
+ "\t"
 whitespaces:
-{ whitespace }
+ { whitespace }
 identifier:
-alpha_char { alphanumeric_char | "_"} { whitespace }
+ alpha_char { alphanumeric_char | "_"} { whitespace }
 newline:
-"\r\n"
-"\n\r"
-"\r"
-"\n"
-";"
+ "\r\n"
+ "\n\r"
+ "\r"
+ "\n"
+ ";"
 newlines:
-whitespaces newline whitespaces { newlines }
+ whitespaces newline whitespaces { newlines }
 entry:
-identifier ":" newlines { definition newlines }
-identifier whitespaces "=" definition newlines
+ identifier ":" newlines { definition newlines }
+ identifier whitespaces "=" definition newlines
 literal:
-"\"" { any_char } "\"" whitespaces [".." whitespaces "\"" { any_char } "\""]
-"\’" { any_char } "\’" whitespaces [".." whitespaces "\'" { any_char } "\'"]
+ "\"" { any_char } "\"" whitespaces [".." whitespaces "\"" { any_char } "\""]
+ "\’" { any_char } "\’" whitespaces [".." whitespaces "\'" { any_char } "\'"]
 definition:
-expression [ {newline | whitespace} "->" {newline | whitespace} output]
+ expression [ {newline | whitespace} "->" {newline | whitespace} output]
 item:
-literal
-identifier
-"{" expression "}"
-"[" expression "]"
-"(" expression ")"
+ literal
+ identifier
+ "{" expression "}"
+ "[" expression "]"
+ "(" expression ")"
 or_expression:
-whitespaces item { whitespaces "|" or_expression }
+ whitespaces item { whitespaces "|" or_expression }
 expression:
-whitespaces or_expression { whitespaces or_expression }
+ whitespaces or_expression { whitespaces or_expression }
 output:
-"#block" | "#indent" [output]
-literal [output]
-identifier [output]
+ "#block" | "#indent" [output]
+ literal [output]
+ identifier [output]
 body:
-{ "#include" {whitespace} literal }
-{ entry }
+ { "#include" {whitespace} literal }
+ { entry }
 script:
-{ body }
+ { body }
 ```
