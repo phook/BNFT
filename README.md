@@ -1,6 +1,5 @@
 BNFT
 ====
-
 Backus Naur Format Transform
 
 About BNFT
@@ -10,11 +9,27 @@ BNFT is pronounced B’ N’ F’ it, or Benefit and the abbreviation stands for
 
 BNFT Testbed
 ------------
-
 Try out BNFT [here](http://phook.dk/BNFT/BNFT testbed.html)
 
 For now availabe examples are Brainfuck and Turtle. An example in the works is the BNFT compiler which will take a BNFT spec and create a dedicated compiler for your language (and it will be able to compile itself :-)
 
+How to call
+-----------
+To use BNFT instanciate it with your syntax BNFT `var bnft = new BNFT(BNFTSyntax)`.
+To parse a source use `bnft.parse(sourceToParse)`. The converted file will be returned (or an error).
+```
+var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
+var result = bnft.parse("ABCD");
+```
+
+Significant Whitespace
+----------------------
+Languages like Python have made indenting replace blocksymbols, complicating BNF syntaxes. A preprocessor function `significantWhitespace(source,blockbegin,blockend,noindents)` has been added to convert indent style blocks to begin and style blocks. Simply call it with your source, define what you want to use for blockbegin and blockend, and specify if you want indents in the output by setting the spacing parameter.
+```
+significantWhitespace(*,"BEGIN","END","\t") // Use BEGIN and END as block delimiters and set tab as indent
+significantWhitespace(*,"{","}","")         // Use curly brackets as block delimiters and skip indents
+significantWhitespace(*,"__B","__E","  ")   // Just silly and double space pr. indent
+```
 
 The BNFT specification
 ----------------------
