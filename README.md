@@ -37,7 +37,8 @@ The BNFT specification holds the transformation code, written in a modified EBNF
 
 Using BNFT
 ==========
-BNFT is a simple style parser that uses some shortcuts to enable its function. The rules are:
+BNFT is a simple style parser that uses some shortcuts to enable its function. 
+The rules are:
 
 Literals
 --------
@@ -96,7 +97,11 @@ block:
  “{“ { statement } “}” -> + “{“ statement “}”
 ```
 
-The Syntax BNF for the .BNFT file
+Entry
+-----
+The last nonterminal specified in the BNFT spec is considered the entry point e.g. `program = { body }`.
+
+The Syntax BNF for the .BNFT spec
 =================================
 ```
 alpha_char:
