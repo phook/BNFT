@@ -17,20 +17,51 @@ alphachar:
 name:
  alphachar { alphachar }
 function:
- "def" whitespace name whitespace newline body whitespace "end"  -> "function " name "() {" body "}"
+ "def" whitespace name whitespace newline body whitespace "end"  -> "function " name "() {\n" body "}\n"
 loop:
- "do" whitespace number whitespace newline body whitespace  "end"  -> "var i=0; for(i=0; i<" number ";i++){" body "}"
+ "do" whitespace number whitespace newline body whitespace  "end"  -> "var i;\nfor (i = 0; i < " number ";i++) {\n" body "}\n"
 statement:
  "call" whitespace name whitespace newline      -> name "();\n"
  "forward" whitespace number whitespace newline -> "_forward(" number ");\n"
  "left"    whitespace number whitespace newline -> "_left(" number ");\n"
- "right"   whitespace number whitespace newline -> "_right(" number ");\n"
- "penup" whitespace newline                     -> "_penup();"
- "pendown" whitespace newline                   -> "_pendown();"
+ "right"   whitespace number whitespace newline -> "_left(-" number ");\n"
+ "penup" whitespace newline                     -> "_penup();\n"
+ "pendown" whitespace newline                   -> "_pendown();\n"
  function whitespace newline
  loop whitespace newline
  newline
 body:
  { whitespace statement }
 program:
- body      -> "var doc = \"<html><body>\"; turtleX = 500;turtleY = 500;turtleAngle = 0;penup=1;function draw(Ax,Ay,Bx,By){if (penup == 0) return;var lineLength = Math.sqrt( (Ax-Bx)*(Ax-Bx)+(Ay-By)*(Ay-By));for( var i=0; i<lineLength; i++ ){doc +=\"<div style=\'position:absolute;left:\"+ Math.round( Ax+(Bx-Ax)*i/lineLength  ) +\"px;top:\"+ Math.round( Ay+(By-Ay)*i/lineLength  ) +\"px;width:1px;height:1px;background:#000\'></div>\";}}function _forward(l){newX = turtleX + Math.cos(turtleAngle) * l; newY = turtleY + Math.sin(turtleAngle) * l; draw(newX,newY,turtleX,turtleY);turtleX = newX;turtleY = newY;}function _left(a){turtleAngle -= a / 180 * 3.14159265;}function _right(a){turtleAngle += a / 180 * 3.14159265;}function _penup(){penup=0;}function _pendown(){penup=1;}"  body "doc+=\"</body></html>\"; window.open('','name','height=1000,width=1000').document.write(doc);"
+ body      -> "
+  var doc = \"<html><body>\";
+  var turtleX = 500;
+  var turtleY = 500;
+  var turtleAngle = 0;
+  var penup=1;
+  function _draw (Ax,Ay,Bx,By) {
+    if (penup == 0) return;
+    var lineLength = Math.sqrt( (Ax-Bx)*(Ax-Bx)+(Ay-By)*(Ay-By));
+    var i;
+    for (i = 0; i < lineLength; i++) {
+      doc +=\"<div style=\'position:absolute;left:\" + Math.round( Ax+(Bx-Ax)*i/lineLength  ) + \"px;top:\"+ Math.round( Ay+(By-Ay)*i/lineLength  ) +\"px;width:1px;height:1px;background:#000\'></div>\";
+    }
+  };
+  function _forward (l) {
+    var newX = turtleX + Math.cos(turtleAngle) * l;
+    var newY = turtleY + Math.sin(turtleAngle) * l;
+    _draw(newX,newY,turtleX,turtleY);
+    turtleX = newX;
+    turtleY = newY;
+  };
+  function _left (a) {
+    turtleAngle -= a / 180 * 3.14159265;
+  };
+  function _penup () {
+    penup=0;
+  };
+  function _pendown () {
+    penup=1;
+  };\n"  body "
+  doc+=\"</body></html>\";
+  window.open('','name','height=1000,width=1000').document.write(doc);"
