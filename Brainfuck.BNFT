@@ -1,15 +1,22 @@
 SIMPLEINSTRUCTION:
- ">"       -> "current++;\n"
- "<"       -> "current--;\n"
- "-"       -> "cell[current]--;\n"
- "+"       -> "cell[current]++;\n"
- "."       -> "document.myForm['console'].value+=String.fromCharCode(cell[current]);\n"
- ","       -> "cell[current] = getInputDialog();\n"
+ ">"  -> "
+      /*>*/ current++;"
+ "<"  -> "
+      /*<*/ current--;"
+ "-"  -> "
+      /*-*/ cell[current]--;"
+ "+"  -> "
+      /*+*/ cell[current]++;"
+ "."  -> "
+      /*.*/ document.myForm['console'].value+=String.fromCharCode(cell[current]);"
+ ","  -> "
+      /*,*/ cell[current] = getInputDialog();"
 
 
 LOOP:
- "[" BODY "]"        -> "while (cell[current] != 0) {" body "}\n"
-
+ "[" BODY "]"     -> "
+      /*[*/ while (cell[current] != 0) {" body "
+      /*]*/ }"
 
 INSTRUCTION:
  LOOP
@@ -19,5 +26,9 @@ BODY:
  { INSTRUCTION }
  
 MAIN:
- BODY    -> "var current=0; cell=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];\n" BODY
-
+ BODY    -> "
+       // This javascript was compiled used the BNFT brainfuck compiler
+       var current=0;
+       var getInputDialog=function() {alert('some input should happen here');};
+       cell=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+       " BODY
