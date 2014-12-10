@@ -652,7 +652,7 @@
             }
             charValue = charValue * 16 + this.lastValue;
           }
-          this.lastChar = charValue.toString();
+          this.lastChar = String.fromCharCode(charValue);
           return true;
         }
         return false;
