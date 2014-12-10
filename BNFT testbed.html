@@ -9,19 +9,12 @@
 <script language="javascript" type="text/javascript" src="BNFT.js">
 </script>
 <form name="myForm">
-<table>
-<tr>
-<td>
-<select name="selector" onchange="Update(this.value)">
-</select>
-</td>
-</tr>
-<tr>
+<select name="selector" onchange="Update(this.value)"></select>
 <button type="button" onclick="DoIt()">Interpret code through BNFT</button>
 <button type="button" onclick="RunIt()">Run resulting code</button>
-</tr>
+<input type="checkbox" id="SignificantWhitespace" value="false"/>Translate significant whitespace to curly brackets
+<table>
 <tr>
-</tr>
 <th>
 BNFT Code
 </th>
@@ -31,6 +24,7 @@ Code to Interpret
 <th>
 Result
 </th>
+</tr>
 <tr>
 <td>
 <textarea name="BNFTcode" rows="20" cols="50"  wrap="off" style="font-family:courier">
@@ -93,8 +87,11 @@ Console
 
 	function DoIt()
 	{
-		var bnft = new BNFT(document.myForm.BNFTcode.value);
+    var significantWhitespaceCB = document.getElementById("SignificantWhitespace");
+    var bnft = new BNFT(document.myForm.BNFTcode.value);
 		var code  = document.myForm.code.value;
+		if (significantWhitespaceCB.checked)
+		  code = bnft.significantWhitespace(code,"{\n","}\n",false);
 		document.myForm.result.value= bnft.parse(code);
 	}
 
