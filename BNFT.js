@@ -214,8 +214,7 @@
             return new this.owner.Result("", currentChar);
           }
         } else {
-          currentChar = currentChar.toLowerCase();
-          if (currentChar >= char1.toLowerCase() && currentChar <= char2.toLowerCase()) {
+          if (currentChar.toLowerCase() >= char1.toLowerCase() && currentChar.toLowerCase() <= char2.toLowerCase()) {
             this.owner.tokenizer.next();
             return new this.owner.Result("", currentChar);
           }
@@ -573,8 +572,8 @@
     };
 
     this._alpha_char = function () {
-      var currentChar = this.tokenizer.currentChar().toLowerCase();
-      if (currentChar >= "a" && currentChar <= "z") {
+      var currentChar = this.tokenizer.currentChar();
+      if (currentChar.toLowerCase() >= "a" && currentChar.toLowerCase() <= "z") {
         this.lastChar = currentChar;
         this.tokenizer.next();
         return true;
@@ -604,8 +603,8 @@
     };
 
     this._hexadecimal_char = function () {
-      var currentChar = this.tokenizer.currentChar().toLowerCase();
-      if ((currentChar >= "a" && currentChar <= "f") || (currentChar >= "0" && currentChar <= "9")) {
+      var currentChar = this.tokenizer.currentChar();
+      if ((currentChar.toLowerCase() >= "a" && currentChar.toLowerCase() <= "f") || (currentChar.toLowerCase() >= "0" && currentChar.toLowerCase() <= "9")) {
         this.lastChar = currentChar;
         this.lastValue = parseInt(currentChar, 16);
         this.tokenizer.next();
