@@ -15,7 +15,7 @@ For now availabe examples are Brainfuck and Turtle. An example in the works is t
 
 How to call
 -----------
-To use BNFT instanciate it with your syntax BNFT `var bnft = new BNFT(BNFTSyntax)`.
+To use BNFT instantiate it with your syntax BNFT `var bnft = new BNFT(BNFTSyntax)`.
 To parse a source use `bnft.parse(sourceToParse)`. The converted file will be returned (or an error).
 ```
 var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
