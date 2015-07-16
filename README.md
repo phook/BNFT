@@ -5,7 +5,7 @@ Backus Naur Format Transform
 About BNFT
 ----------
 BNFT is a tool for extraction information from text, checking against a BNF grammar (Backus-Naur-Form) and transform text into another text.
-BNFT is pronounced B’ N’ F’ it, or Benefit and the abbreviation stands for Backus Naur Form Transformer. This document is not a tutorial or BNF or EBNF and familiarity with these subject are assumed.
+BNFT is pronounced B’ N’ F’ it, or Benefit and the abbreviation stands for Backus Naur Form Transformer. This document is not a tutorial on BNF or EBNF and familiarity with these subject are assumed.
 
 BNFT Testbed
 ------------
