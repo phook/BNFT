@@ -11,7 +11,7 @@ BNFT Testbed
 ------------
 Try out BNFT [here](http://phook.dk/BNFT/BNFT testbed.html)
 
-For now availabe examples are Brainfuck and Turtle. An example in the works is the BNFT compiler which will take a BNFT spec and create a dedicated compiler for your language (and it will be able to compile itself :-)
+For now availabe examples are Brainfuck and Turtle.
 
 How to call
 -----------
