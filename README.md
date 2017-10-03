@@ -92,7 +92,7 @@ String = “Hello” person -> “Goodbye “ person “ and have a nice day”
 “#block” signifies a indentation so that nonterminals called from within this line will have 1 greater indentation.
 ```
 statement:
- single_statement -> #indend single_statement
+ single_statement -> #indent single_statement
 block:
  “{“ { statement } “}” -> #block “{“ statement “}”
 ```
