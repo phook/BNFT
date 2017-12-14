@@ -9,7 +9,7 @@ BNFT is pronounced B’ N’ F’ it, or Benefit and the abbreviation stands for
 
 BNFT Testbed
 ------------
-Try out BNFT [here](http://phook.dk/BNFT/BNFT testbed.html)
+Try out BNFT [here](https://phook.dk/BNFT/BNFT testbed.html)
 
 For now availabe examples are Brainfuck and Turtle.
 
