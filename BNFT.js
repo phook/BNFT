@@ -262,6 +262,7 @@
         }
 
         this.owner.tokenizer.unPeek();
+        return null;
       };
     };
 
@@ -318,6 +319,7 @@
             this.owner.tokenizer.unPeek();
           }
         }
+        return null;
       };
     };
 
