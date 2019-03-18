@@ -7,7 +7,7 @@
   var previous_BNFT = root.BNFT;
 
 
-  var BNFT = function (source) {
+  var BNFT = function (source,alert) {
     // SIGNIFICANT WHITESPACE VARIABLES
     this.outputblockbegin = "";
     this.outputblockend = "";
@@ -547,7 +547,8 @@
         }
 
         if (result === null) {
-          //alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
+          if (typeof(alert) == "function")
+            alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
           return null;
         }
 
@@ -1144,11 +1145,14 @@
       return message;
     };
 
-    this.parse = function (source) {
       if (!this._script()) {
-        alert(this.errorFormatting("BNFT Source parse fail")); // ERROR REPORTING
+        if (typeof(alert) == "function")
+			alert(this.errorFormatting("BNFT Source parse fail")); // ERROR REPORTING
         return "ERROR";
       }
+
+
+    this.parse = function (source, alert) {
       this.tokenizer = new this.Tokenizer(source);
       if (this.lastExpression !== null) {
         this.errorPosition = -1;
@@ -1157,10 +1161,12 @@
         if (result !== null) {
           return result.result();
         }
-        alert(this.errorFormatting("BNFT parse fail"));
+        if (typeof(alert) == "function")
+          alert(this.errorFormatting("BNFT parse fail"));
         return "ERROR";
       }
-      alert(this.errorFormatting("BNFT parse fail"));
+        if (typeof(alert) == "function")
+          alert(this.errorFormatting("BNFT parse fail"));
       return "ERROR";
     };
 /*
