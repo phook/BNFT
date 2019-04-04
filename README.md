@@ -83,11 +83,18 @@ And expressions are default when a sequence is specified: “a” “b” “c�
 Transformations
 ---------------
 The “->” operator signified a transformation. It can be used to replace with, swap identifiers and
-control indentation. On the right side of the “->” operator you can write literals, nonterminals and the indent processing keywords #indent and #block
+control indentation. On the right side of the “->” operator you can write literals, nonterminals and the indent processing keywords #indent and #block, and the uridecoding #decodeuri
 
 ```
 String = “Hello” person -> “Goodbye “ person “ and have a nice day”
 ```
+
+Note that nonterminals are concatenated so you just have to write them once:
+
+```
+Hex = hex hex hex hex -> “this is all the hexes “ hex
+```
+
 “#indent” will insert spaces that matches the current indentation (controlled by “#block”)
 “#block” signifies a indentation so that nonterminals called from within this line will have 1 greater indentation.
 ```
@@ -96,6 +103,12 @@ statement:
 block:
  “{“ { statement } “}” -> #block “{“ statement “}”
 ```
+“#decodeuri” will insert the decoded uri from the following literals and nonterminals
+```
+statement:
+ escaped_chars -> #decodeuri escaped_chars
+```
+
 
 Entry
 -----
