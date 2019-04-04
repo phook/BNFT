@@ -1,4 +1,3 @@
-/*jslint nomen: true, plusplus: true, vars: true, indent: 2*/
 (function () {
 
   "use strict";
@@ -500,11 +499,25 @@
                           }
                           i = i + 1;
                         } else {
-                          if (localEntry[0] === '"') {
-                            concat += localEntry.substring(1);
-                          } else {
-                            concat += result.find(localEntry);
-                          }
+                            if (localEntry === "#encodeuri") {
+                              var escapeSequence = "";
+                              if (i + 1 < this.newOutputSpecification.length) {
+                                nextEntry = this.newOutputSpecification[i + 1];
+                                escapeSequence = result.find(nextEntry);
+                              }
+                              try {
+                                concat += encodeURIComponent(escapeSequence);
+                              } catch (e)
+                              {
+                              }
+                              i = i + 1;
+                            } else {
+                              if (localEntry[0] === '"') {
+                                concat += localEntry.substring(1);
+                              } else {
+                                concat += result.find(localEntry);
+                              }
+                            }
                         }
                     }
                   }
@@ -1118,6 +1131,12 @@
 
       if (this.tokenizer.nextIs("#decodeuri")) {
         this.lastOutput.push("#decodeuri");
+        this._output();
+        return true;
+      }
+
+      if (this.tokenizer.nextIs("#encodeuri")) {
+        this.lastOutput.push("#encodeuri");
         this._output();
         return true;
       }
