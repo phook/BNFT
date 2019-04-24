@@ -15,12 +15,14 @@ For now availabe examples are Brainfuck and Turtle.
 
 How to call
 -----------
-To use BNFT instantiate it with your syntax BNFT `var bnft = new BNFT(BNFTSyntax)`.
-To parse a source use `bnft.parse(sourceToParse)`. The converted file will be returned (or an error).
+To use BNFT instantiate it with your syntax BNFT `var bnft = new BNFT(BNFTSyntaxString)`.
+To parse a source use `bnft.parse(sourceToParse [,options])`.  
+The converted file will be returned (or an error).
 ```
 var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
 var result = bnft.parse("ABCD");
 ```
+
 
 Significant Whitespace
 ----------------------
