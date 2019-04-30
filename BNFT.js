@@ -1,3 +1,4 @@
+/*jslint nomen: true, plusplus: true, vars: true, indent: 2*/
 (function () {
 
   "use strict";
@@ -6,12 +7,26 @@
   var previous_BNFT = root.BNFT;
 
 
-  var BNFT = function (source,alert) {
+  var BNFT = function (source,options) {
+
+      if (options && typeof(options.fileToString) == "function")
+      {
+          this.fileToString = options.fileToString;
+      }
+
+      if (options && typeof(options.path) =="string")
+      {
+          this.path = options.path;
+      }
+      else
+          this.path = "";
+
     // SIGNIFICANT WHITESPACE VARIABLES
     this.outputblockbegin = "";
     this.outputblockend = "";
 
     this.Tokenizer = function (source) {
+
       this.source = source;
       this.position = 0; // current position (or current peekposition if peeking)
 
@@ -482,7 +497,10 @@
                         fileToInclude = result.find(nextEntry);
                         fileToInclude = fileToInclude.replace("\"", "");
                         fileToInclude = fileToInclude.replace("\'", "");
-                        this.owner.tokenizer.insertFrom(mark, this.owner.fileToString(fileToInclude));
+                        if (this.owner.fileToString)
+                            this.owner.tokenizer.insertFrom(mark, this.owner.fileToString(this.owner.path+fileToInclude));
+                        else
+                            this.error("#include needs options.fileToString definition");
                         i = i + 1;
                       }
                     } else {
@@ -574,8 +592,8 @@
         }
 
         if (result === null) {
-          if (typeof(alert) == "function")
-            alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
+          if (typeof(options.alert) == "function")
+            options.alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
           return null;
         }
 
@@ -839,7 +857,11 @@
           return false;
         }
 
-        this.tokenizer.insertFrom(mark, this.fileToString(this.lastIdentifier));
+        if (this.fileToString)
+            this.tokenizer.insertFrom(mark, this.fileToString(this.path + this.lastIdentifier));
+        else
+            this.error("#include needs options.fileToString definition");
+
       } else {
         if (this.tokenizer.nextIs("#significantwhitespace")) {
           if (!this.tokenizer.nextIs(" ")) {
@@ -1147,6 +1169,21 @@
         return true;
       }
 
+      if (this.tokenizer.nextIs("#significantwhitespace")) {
+        if (!this._output_literal())
+            return this.error("expected blockbegin literal");
+        this.owner.entry.slice(-1)[0].blockBegin = this.lastIdentifier;
+        if (!this._output_literal())
+            return this.error("expected blockend literal");
+        this.owner.entry.slice(-1)[0].blockEnd = this.lastIdentifier;
+        if (this._output_literal())
+            this.owner.entry.slice(-1)[0].indentType = this.lastIdentifier;
+        else
+            this.owner.entry.slice(-1)[0].indentType = "";
+        return true;
+      }
+
+
       if (this._output_literal()) {
         this.lastOutput.push("\"" + this.lastIdentifier);
         this._output();
@@ -1185,38 +1222,11 @@
     };
 
       if (!this._script()) {
-        if (typeof(alert) == "function")
-			alert(this.errorFormatting("BNFT Source parse fail")); // ERROR REPORTING
+        if (typeof(options.alert) == "function")
+			options.alert(this.errorFormatting("BNFT Source parse fail")); // ERROR REPORTING
         return "ERROR";
       }
 
-
-    this.parse = function (source, alert) {
-      this.tokenizer = new this.Tokenizer(source);
-      if (this.lastExpression !== null) {
-        this.errorPosition = -1;
-        this.lastExpression.fold();
-        var result = this.lastExpression.parse();
-        if (result !== null) {
-          return result.result();
-        }
-        if (typeof(alert) == "function")
-          alert(this.errorFormatting("BNFT parse fail"));
-        return "ERROR";
-      }
-        if (typeof(alert) == "function")
-          alert(this.errorFormatting("BNFT parse fail"));
-      return "ERROR";
-    };
-/*
-    this.fileToString = function (filePath) {
-    // some xmlhttp magic
-    }
-
-    this.stringToFile = function (filePath, string) {
-    // more magic
-    }
-*/
     this.significantWhitespace = function (source, blockbegin, blockend, noindents) {
       this.noindents = noindents;
       var indents = function (size) {
@@ -1279,6 +1289,50 @@
       }
       return newsource;
     };
+
+    this.parse = function (source, options) {
+      if (this.lastExpression !== null) {
+        this.errorPosition = -1;
+        this.lastExpression.fold();
+        var start_non_terminal = this.lastExpression;
+        if (options && typeof(options.fileToString) == "function")
+        {
+            this.fileToString = options.fileToString;
+        }
+        if (options && typeof(options.nonterminal) == "string")
+        {
+            start_non_terminal = null;
+              for(var i in this.entry)
+              {
+                  if (this.entry[i].nonterminal === options.nonterminal)
+                  {
+                      start_non_terminal = this.entry[i];
+                      break;
+                  }
+              }
+        }
+        if (!start_non_terminal)
+        {
+            if (options && typeof(options.alert) == "function")
+              options.alert("nonterminal "+options.nonterminal+" not found");
+            return "ERROR";
+        }
+        if (start_non_terminal.blockBegin)
+            source = this.significantWhitespace(source, start_non_terminal.blockBegin, start_non_terminal.blockEnd, start_non_terminal.indentType);
+        this.tokenizer = new this.Tokenizer(source);
+        var result = start_non_terminal.parse();
+        if (result !== null) {
+          return result.result();
+        }
+        if (options && typeof(options.alert) == "function")
+          options.alert(this.errorFormatting("BNFT parse fail"));
+        return "ERROR";
+      }
+        if (options &&typeof(options.alert) == "function")
+          options.alert(this.errorFormatting("BNFT parse fail"));
+      return "ERROR";
+    };
+
   };
 
 /* SIMPLE TEST
