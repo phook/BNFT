@@ -1150,16 +1150,16 @@
         this._eat_whitespaces();
         if (!this._output_literal())
             return this.error("expected blockbegin literal");
-        this.owner.entry.slice(-1)[0].blockBegin = this.lastIdentifier;
+        this.entry.slice(-1)[0].blockBegin = this.lastIdentifier;
         this._eat_whitespaces();
         if (!this._output_literal())
             return this.error("expected blockend literal");
-        this.owner.entry.slice(-1)[0].blockEnd = this.lastIdentifier;
+        this.entry.slice(-1)[0].blockEnd = this.lastIdentifier;
         this._eat_whitespaces();
         if (this._output_literal())
-            this.owner.entry.slice(-1)[0].indentType = this.lastIdentifier;
+            this.entry.slice(-1)[0].indentType = this.lastIdentifier;
         else
-            this.owner.entry.slice(-1)[0].indentType = "";
+            this.entry.slice(-1)[0].indentType = "";
         return true;
       }
 
