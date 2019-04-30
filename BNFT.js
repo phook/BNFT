@@ -876,8 +876,7 @@
               return this.tokenizer.endOfScript();
             }
           }
-        }
-      }
+        }      
       return this._script();
     };
 
