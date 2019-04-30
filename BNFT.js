@@ -303,7 +303,7 @@
       };
 
       // override since this is optional
-      this.isOptional = function () {
+      this.isOptional = function () { 
         return true;
       };
 
