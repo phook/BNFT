@@ -863,28 +863,6 @@
             this.error("#include needs options.fileToString definition");
 
       } else {
-        if (this.tokenizer.nextIs("#significantwhitespace")) {
-          if (!this.tokenizer.nextIs(" ")) {
-            return false;
-          }
-
-          this.eat_whitepspaces();
-
-          if (!this._output_literal()) {
-            return this.error("string literal expected");
-          }
-          this.outputblockbegin = this.lastidentifer;
-
-          if (!this._output_literal()) {
-            return this.error("string literal expected");
-          }
-          this.outputblockend = this.lastidentifer;
-
-          if (!this._advanceline()) {
-            return false;
-          }
-          this.significantwhitespace = true;
-        } else {
           if (this.tokenizer.nextIs("#")) {
             while (!this._isnextnewline() && !this.tokenizer.endOfScript()) {
               this.tokenizer.next();
@@ -1170,12 +1148,15 @@
       }
 
       if (this.tokenizer.nextIs("#significantwhitespace")) {
+        this.eat_whitespaces();
         if (!this._output_literal())
             return this.error("expected blockbegin literal");
         this.owner.entry.slice(-1)[0].blockBegin = this.lastIdentifier;
+        this.eat_whitespaces();
         if (!this._output_literal())
             return this.error("expected blockend literal");
         this.owner.entry.slice(-1)[0].blockEnd = this.lastIdentifier;
+        this.eat_whitespaces();
         if (this._output_literal())
             this.owner.entry.slice(-1)[0].indentType = this.lastIdentifier;
         else
