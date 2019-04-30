@@ -6,8 +6,17 @@
 	<meta name="generator" content="BBEdit 10.1" />
 </head>
 <body>
-<script language="javascript" type="text/javascript" src="BNFT.js">
+<!--<script type="text/plain" src="https://rawgithubusercontent.com/phook/BNFT/master/BNFT.js">
+</script>-->
+
+<script>
+    var global = this;
+    var oReq = new XMLHttpRequest(); 
+    oReq.addEventListener("load", 
+       function fLoad() {eval.call(global,this.responseText)}); 
+    oReq.open("GET", 'https://raw.githubusercontent.com/phook/BNFT/master/BNFT.js'); oReq.send(); false;
 </script>
+
 <form name="myForm">
 <select name="selector" onchange="Update(this.value)"></select>
 <button type="button" onclick="DoIt()">Interpret code through BNFT</button>
@@ -54,37 +63,30 @@ Console
 </form>
 
 <script language="javascript" type="text/javascript">
-
 	var examples = [
-				{"Name" : "Brainfuck Example", "BNFTfile" : "Brainfuck.BNFT", "Codefile" : "Brainfuck.code", "Consolefile" : "Brainfuck.txt", "Runnable" : true},
-				{"Name" : "Turtle Example", "BNFTfile" : "Turtle.BNFT", "Codefile" : "Turtle.code", "Consolefile" : "Turtle.txt", "Runnable" : true}
+				{"Name" : "Brainfuck Example", "BNFTfile" : "https://raw.githubusercontent.com/phook/BNFT/master/Brainfuck.BNFT", "Codefile" : "https://raw.githubusercontent.com/phook/BNFT/master/Brainfuck.code", "Consolefile" : "https://raw.githubusercontent.com/phook/BNFT/master/Brainfuck.txt", "Runnable" : true},
+				{"Name" : "Turtle Example", "BNFTfile" : "https://raw.githubusercontent.com/phook/BNFT/master/Turtle.BNFT", "Codefile" : "https://raw.githubusercontent.com/phook/BNFT/master/Turtle.code", "Consolefile" : "https://raw.githubusercontent.com/phook/BNFT/master/Turtle.txt", "Runnable" : true}
                      ];
-
 	var sel = document.myForm.selector;
 	for (var i = 0; i < examples.length; i++) 
 	{
     		var current = examples[i];
     		var opt=document.createElement('option');
-
     		opt.value = i;
     		opt.textContent = current.Name;
-
     		sel.appendChild(opt);
 	}
-
 	function LoadIt(src,dst)
 	{    
 		function reqListener () 
 		{
 	      	document.myForm[dst].value = this.responseText;
     		}
-
 	    	var oReq = new XMLHttpRequest();
     		oReq.onload = reqListener;
     		oReq.open("get", src, true);
     		oReq.send();
 	}
-
 	function DoIt()
 	{
     var significantWhitespaceCB = document.getElementById("SignificantWhitespace");
@@ -92,15 +94,13 @@ Console
 		var code  = document.myForm.code.value;
 		if (significantWhitespaceCB.checked)
 		  code = bnft.significantWhitespace(code,"{\n","}\n",false);
-		document.myForm.result.value= bnft.parse(code);
+		document.myForm.result.value= bnft.parse(code,console.log);
 	}
-
 	function RunIt()
 	{
 		var code  = document.myForm.result.value;
 		eval(code);
 	}
-
 	function Update(no)
 	{
 		LoadIt(examples[no].BNFTfile,"BNFTcode");
@@ -108,7 +108,6 @@ Console
 		LoadIt(examples[no].Consolefile,"console");
 	      document.myForm["result"].value = "";
 	}
-
 	Update(0);
 </script>
 </body>
