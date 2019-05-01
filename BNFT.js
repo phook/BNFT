@@ -661,7 +661,7 @@
       return false;
     };
 
-    this._any_char = function () {
+    this._any_char = function (report_error) {
       var i;
       this.lastChar = this.tokenizer.nextChar();
       if (this.lastChar === "\\") {
@@ -695,7 +695,7 @@
           for (i = 0; i < 4; i++) {
             result = this._hexadecimal_char();
             if (!result) {
-              return this.error("hexadecimal char expected");
+              return report_error || this.error("hexadecimal char expected");
             }
             charValue = charValue * 16 + this.lastValue;
           }
@@ -725,7 +725,7 @@
       return false;
     };
 
-    this._identifier = function () {
+    this._identifier = function (report_error) {
       this.lastIdentifier = "";
       if (this._alpha_char()) {
         this.lastIdentifier = this.lastChar;
@@ -735,7 +735,7 @@
         this._whitespace();
         return true;
       }
-      return false;//this.error("identifier expected");
+      return report_error || this.error("identifier expected");
     };
 
     this._newline = function () {
@@ -790,21 +790,21 @@
       this.tokenizer.peek();
       if (this._definition()) {
         this.tokenizer.unPeek();
-        this._definition();
+        this._definition(true);
         return true;
       }
       this.tokenizer.unPeek();
       return false;
     };
 
-    this._entry = function () {
+    this._entry = function (report_error) {
       if (this._identifier()) {
         var localEntry = new this.OrExpression(this, this.lastIdentifier);
         if (this.tokenizer.nextIs(":")) {
           if (!this._nextline()) {
             return false;
           }
-          if (!this._definition()) {
+          if (!this._definition(true)) {
             return false;
           }
 
@@ -825,7 +825,7 @@
           return true;
         }
         if (this.tokenizer.nextIs("=")) {
-          if (!this._definition()) {
+          if (!this._definition(true)) {
             return false;
           }
           if (this.lastExpression !== null) {
@@ -837,7 +837,7 @@
           return true;
         }
       }
-      return this.error(": or = expected");
+      return report_error || this.error(": or = expected");
     };
 
     this._script = function () {
@@ -849,7 +849,7 @@
 
         this._eat_whitespaces();
 
-        if (!this._output_literal()) {
+        if (!this._output_literal(true)) {
           return false;
         }
 
@@ -880,7 +880,7 @@
       return this._script();
     };
 
-    this._literal = function () {
+    this._literal = function (report_error) {
       var literalEnclosing = this.tokenizer.currentChar();
       if (literalEnclosing !== "\"" && literalEnclosing !== "'") {
         return false;
@@ -888,14 +888,14 @@
       this.tokenizer.next();
       var literal = "";
       var enter = this.tokenizer.currentChar() === "\\";
-      this._any_char();
+      this._any_char(true);
       while (this.lastChar !== literalEnclosing || enter) {
         literal += this.lastChar;
         enter = this.tokenizer.currentChar() === "\\";
-        this._any_char();
+        this._any_char(true);
       }
       if (this.lastChar !== literalEnclosing) {
-        return this.error(literalEnclosing + " expected");
+        return report_error || this.error(literalEnclosing + " expected");
       }
       this._eat_whitespaces();
 
@@ -904,18 +904,18 @@
       if (this.tokenizer.nextIs("..")) {
         this._eat_whitespaces();
         if (!this.tokenizer.nextIs(literalEnclosing)) {
-          return this.error(literalEnclosing + " expected");
+          return report_error || this.error(literalEnclosing + " expected");
         }
         var secondLiteral = "";
         enter = this.tokenizer.currentChar() === "\\";
-        this._any_char();
+        this._any_char(true);
         while (this.lastChar !== literalEnclosing || enter) {
           secondLiteral += this.lastChar;
           enter = this.tokenizer.currentChar() === "\\";
-          this._any_char();
+          this._any_char(true);
         }
         if (this.lastChar !== literalEnclosing) {
-          return this.error(literalEnclosing + " expected");
+          return report_error || this.error(literalEnclosing + " expected");
         }
 
         if (!this.tokenizer.peeking()) {
@@ -932,9 +932,9 @@
       return true;
     };
 
-    this._output_literal = function () {
+    this._output_literal = function (report_error) {
       if (!this.tokenizer.nextIs("\"")) {
-        return this.error("\" expected");
+        return report_error || this.error("\" expected");
       }
       this.lastIdentifier = "";
       var enter = this.tokenizer.currentChar() === "\\";
@@ -945,13 +945,13 @@
         this._any_char();
       }
       if (this.lastChar !== "\"") {
-        return this.error("\" expected");
+        return report_error || this.error("\" expected");
       }
       this._eat_whitespaces();
       return true;
     };
 
-    this._definition = function () {
+    this._definition = function (report_error) {
       this._eat_whitespaces();
       if (!this._expression()) {
         return false;
@@ -976,20 +976,20 @@
         }
 
         if (!this._advanceline()) {
-          return this.error("newline expected");
+          return report_error || this.error("newline expected");
         }
 
         result = true;
       }
 
       if (!result) {
-        return this.error("newline expected");
+        return report_error || this.error("newline expected");
       }
 
       return true;
     };
 
-    this._item = function () {
+    this._item = function (report_error) {
 
       if (this._literal()) {
         return true;
@@ -1010,7 +1010,7 @@
         }
 
         if (!this.tokenizer.nextIs("}")) {
-          return this.error(") expected");
+          return report_error || this.error(") expected");
         }
 
         return true;
@@ -1024,7 +1024,7 @@
         }
 
         if (!this.tokenizer.nextIs("]")) {
-          return this.error("] expected");
+          return report_error || this.error("] expected");
         }
 
         return true;
@@ -1034,7 +1034,7 @@
         this._expression();
 
         if (!this.tokenizer.nextIs(")")) {
-          return this.error("} expected");
+          return report_error || this.error("} expected");
         }
 
         return true;
@@ -1045,7 +1045,7 @@
     this._or_expression = function () {
       var orExpression = null;
 
-      if (!this._item()) {
+      if (!this._item(true)) {
         return false;
       }
 
@@ -1058,7 +1058,7 @@
         }
 
         this._eat_whitespaces();
-        this._item();
+        this._item(true);
         this._eat_whitespaces();
 
         if (orExpression !== null && this.lastExpression !== null) {
@@ -1113,7 +1113,7 @@
       return true;
     };
 
-    this._output = function () {
+    this._output = function (report_error) {
       this._eat_whitespaces();
 
       if (this.tokenizer.nextIs("#block")) {
@@ -1148,12 +1148,12 @@
 
       if (this.tokenizer.nextIs("#significantwhitespace")) {
         this._eat_whitespaces();
-        if (!this._output_literal())
-            return this.error("expected blockbegin literal");
+        if (!this._output_literal(report_error))
+            return report_error || this.error("expected blockbegin literal");
         this.entry.slice(-1)[0].blockBegin = this.lastIdentifier;
         this._eat_whitespaces();
-        if (!this._output_literal())
-            return this.error("expected blockend literal");
+        if (!this._output_literal(report_error))
+            return report_error || this.error("expected blockend literal");
         this.entry.slice(-1)[0].blockEnd = this.lastIdentifier;
         this._eat_whitespaces();
         if (this._output_literal())
@@ -1175,7 +1175,7 @@
         this._output();
         return true;
       }
-      return this.error("output definition expected");
+      return report_error || this.error("output definition expected");
     };
 
     this.errorFormatting = function (message) {
