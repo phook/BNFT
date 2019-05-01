@@ -303,7 +303,7 @@
       };
 
       // override since this is optional
-      this.isOptional = function () { 
+      this.isOptional = function () {
         return true;
       };
 
@@ -735,7 +735,7 @@
         this._whitespace();
         return true;
       }
-      return this.error("identifier expected");
+      return false;//this.error("identifier expected");
     };
 
     this._newline = function () {
