@@ -120,33 +120,25 @@
       this.next = null;
 
       this.add = function (item) {
-        if (this.next) {
-          this.next.add(item);
-        } else {
-          this.next = item;
-        }
+        var nextChain = this;
+	while (nextChain.next)
+	{
+	  nextChain = nextChain.next;
+	}
+	nextChain.next = item;
       };
+	    
+      this.find = function (identifier) {
 
-      this.find = function (identifier, number) {
-        number = number === undefined ? -1 : number;
-
-        if (this.identifier === identifier) {
-          if (number === 0 || this.next === null) {
-            return this.myresult;
+	var nextChain = this;
+	var result = "";
+	      
+	while (nextChain)
+	{
+          if (nextChain.identifier === identifier) {
+            result += nextChain.myresult;
           }
-          return this.myresult + this.next.find(identifier, number--);
-        }
-
-        if (this.next) {
-          return this.next.find(identifier, number);
-        }
-
-        return "";
-      };
-
-      this.result = function () {
-        if (this.next) {
-          return this.myresult + this.next.result();
+	  nextChain = nextChain.next;
         }
         return result;
       };
