@@ -90,7 +90,7 @@
       this.peekNextIs = function (s, caseSensitive) {
 
         caseSensitive = (caseSensitive === undefined) ? true : caseSensitive;
-
+ 
         if (this.position + s.length > this.source.length) {
           return false;
         }
