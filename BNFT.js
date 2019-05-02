@@ -142,6 +142,18 @@
         }
         return result;
       };
+	    
+      this.result = function() {
+	var nextChain = this;
+	var result = "";
+	      
+	while (nextChain)
+	{
+          result += nextChain.myresult;
+	  nextChain = nextChain.next;
+        }
+        return result;
+      }
     };
 
     // Interface Expression
