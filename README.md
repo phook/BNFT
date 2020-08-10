@@ -18,10 +18,20 @@ How to call
 To use BNFT instantiate it with your syntax BNFT `var bnft = new BNFT(BNFTSyntaxString)`.
 To parse a source use `bnft.parse(sourceToParse)`. The converted file will be returned (or an error).
 ```
-var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
-var result = bnft.parse("ABCD");
+var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}' [, options]);
+var result = bnft.parse("ABCD" [, options]);
 ```
 
+Options
+-------
+
+Following options can be set in call:
+
+option        | description
+--------------|------------------------------------------------------------------------------------------------
+alert         | a function to call for errors and alerts, typical console.log or alert
+fileToString  | a function to call for #includes that loads a file and returns it as a string
+nonTerminal   | a string that names the enty non terminal, overriding the default which is the last one defined
 
 Significant Whitespace
 ----------------------
@@ -31,6 +41,8 @@ significantWhitespace(*,"BEGIN","END","\t") // Use BEGIN and END as block delimi
 significantWhitespace(*,"{","}","")         // Use curly brackets as block delimiters and skip indents
 significantWhitespace(*,"__B","__E","  ")   // Just silly and double space pr. indent
 ```
+
+The significant whitespace function can also be invoked from within the syntax specification itself by including the #significantwhitespace in the transformation part.
 
 The BNFT specification
 ----------------------
@@ -111,11 +123,17 @@ statement:
  unescaped_chars -> #encodeuri unescaped_chars
  escaped_chars   -> #decodeuri escaped_chars
 ```
+“#significantwhitespace allows the input to be processed before subjecting it to the BNF.
+variables are insert_for_start_block, insert_for_end_block, indent_character (" " or "\t")
+```
+program:
+ python_like -> #significantwhitespace "{" "}" " " python_like
+```
 
 
 Entry
 -----
-The last nonterminal specified in the BNFT spec is considered the entry point e.g. `program = { body }`.
+The last nonterminal specified in the BNFT spec is considered the entry point e.g. `program = { body }`, unless specified otherwise in options.
 
 The Syntax BNF for the .BNFT spec
 =================================
@@ -178,7 +196,7 @@ or_expression:
 expression:
  whitespaces or_expression { whitespaces or_expression }
 output:
- "#block" | "#indent" [output]
+ "#block" | "#indent" | "#significantwhitespace" | "#decodeuri" | "#encodeuri" [output]
  literal [output]
  identifier [output]
 body:
