@@ -7,11 +7,17 @@ About BNFT
 BNFT is a tool for extraction information from text, checking against a BNF grammar (Backus-Naur-Form) and transform text into another text.
 BNFT is pronounced B’ N’ F’ it, or Benefit and the abbreviation stands for Backus Naur Form Transformer. This document is not a tutorial on BNF or EBNF and familiarity with these subject are assumed.
 
+What BNFT adds to the BNF notation is the Transformation part. Conceptually all nonterminals "return" the value they match, except for when and alternative output is definced by adding the "->" operator at the end. This means that nonterminals and terminals can be changed into something else, and nonterminals can be inserted in the output in another order than they occur in the syntax matching.
+
 BNFT Testbed
 ------------
 Try out BNFT [here](http://jsfiddle.net/phook/h8evd5bj/embedded/result)
 
-For now availabe examples are Brainfuck and Turtle.
+The Testbed sports 4 subwindows, with the BNFT source code, a sample input to run through the BNFT transformation, an output window and a console for error messages and optional console output from running programs. Buttons allow for translating input and running the output - provided it is written in javascript format.
+
+For now available examples are Brainfuck and Turtle. The Brainfuck example is the "Hello World" example from wikipedia and Hello World gets output to the console. The Turtle example implements a simple version of Turtle and opens a popup window with the result. Both languages are interactive, which means you can write your own Brainfuck/Turtle program in the "Code to Interpret" window.
+
+The whitespace option can be used to experiment with significant whitespace grammars, however this has become part of the BNFT spec, so it can be done implicitly.
 
 How to call
 -----------
@@ -95,7 +101,7 @@ And expressions are default when a sequence is specified: “a” “b” “c�
 
 Transformations
 ---------------
-The “->” operator signified a transformation. It can be used to replace with, swap identifiers and
+The “->” operator signifies a transformation. It can be used to replace with, swap identifiers and
 control indentation. On the right side of the “->” operator you can write literals, nonterminals and the indent processing keywords #indent and #block, and the urien/decoding #encodeuri and #decodeuri
 
 ```
