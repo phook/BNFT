@@ -596,8 +596,9 @@
         }
 
         if (result === null) {
-          if (typeof(options.alert) == "function")
-            options.alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
+          if (!owner.tokenizer.peeking())
+            if (typeof(options.alert) == "function")
+                options.alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
           return null;
         }
 
@@ -1296,8 +1297,9 @@
               }
             if (!start_non_terminal)
             {
-                if (typeof(options.alert) == "function")
-                  options.alert("nonterminal "+options.nonterminal+" not found");
+                if (!owner.tokenizer.peeking())
+                    if (typeof(options.alert) == "function")
+                        options.alert("nonterminal "+options.nonterminal+" not found");
                 return "ERROR";
             }
         }
