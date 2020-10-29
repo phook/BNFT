@@ -1297,7 +1297,7 @@
               }
             if (!start_non_terminal)
             {
-                if (!this.owner.tokenizer.peeking())
+                if (!this.tokenizer.peeking())
                     if (typeof(options.alert) == "function")
                         options.alert("nonterminal "+options.nonterminal+" not found");
                 return "ERROR";
