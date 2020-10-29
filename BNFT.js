@@ -596,7 +596,7 @@
         }
 
         if (result === null) {
-          if (!owner.tokenizer.peeking())
+          if (!this.owner.tokenizer.peeking())
             if (typeof(options.alert) == "function")
                 options.alert("Missing identifier: " + this.identifier); /// REPORT ERRORS?
           return null;
@@ -1297,7 +1297,7 @@
               }
             if (!start_non_terminal)
             {
-                if (!owner.tokenizer.peeking())
+                if (!this.owner.tokenizer.peeking())
                     if (typeof(options.alert) == "function")
                         options.alert("nonterminal "+options.nonterminal+" not found");
                 return "ERROR";
