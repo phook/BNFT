@@ -1,4 +1,7 @@
 /*jslint nomen: true, plusplus: true, vars: true, indent: 2*/
+args = []
+if (typeof(process) != "undefined") 
+    args = process.argv;
 (function () {
 
   "use strict";
@@ -30,6 +33,8 @@
       this.source = source;
       this.position = 0; // current position (or current peekposition if peeking)
 
+      this.lastPosition = 0;
+
       this.peekPosition = []; // for storing current position when peeking
       this.indents = []; // for indents - significant whitespace
 
@@ -47,6 +52,8 @@
       // advances position
       this.next = function () {
         this.position += 1;
+        if (this.position > this.lastPosition)
+            this.lastPosition = this.position;
       };
 
       // returns current char
@@ -1308,6 +1315,15 @@
         this.tokenizer = new this.Tokenizer(source);
         var result = start_non_terminal.parse();
         if (result !== null) {
+          if (this.tokenizer.position !== this.tokenizer.source.length)
+          {
+            // parsing not finished
+            let startpoint = this.tokenizer.lastPosition;
+            while (startpoint > 0 && this.tokenizer.source[startpoint] !== "\n") startpoint--;
+            let endpoint = this.tokenizer.lastPosition;
+            while (endpoint < this.tokenizer.source.length && this.tokenizer.source[endpoint] !== "\n") endpoint++;
+            return "ERROR: " + this.tokenizer.source.substring(startpoint,endpoint);
+           }
           return result.result();
         }
         if (options && typeof(options.alert) == "function")
@@ -1327,7 +1343,41 @@ var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
 document.write(bnft.parse("ABCD"));
 
 */
+    let saveStringResource = function(url,string,overwrite) {
+        const fs = require("fs");
+        if (overwrite || !fs.existsSync(url))
+            fs.writeFileSync(url, string, function (err) {
+          if (err) return console.log(err);
+        });
+        else
+            console.log("file exists");
+    }
+    let resourceAsString = function(url)
+    {
+        const fs = require("fs");
+        return fs.readFileSync(url, {option:'utf8', function(err, source) {console.log("error reading "+filename);throw err;}}).toString();
+    }
 
+
+  if (typeof arguments[2] != "undefined")
+  {
+      let bnft_file     = arguments[2];
+      let source_file   = arguments[3];
+      let compiled_file = arguments[4];
+      let start_non_terminal  = arguments[5];
+      
+      let bnft_spec = resourceAsString(bnft_file);
+      
+      let parser = new BNFT(bnft_spec,{fileToString:resourceAsString,alert:console.log});
+      
+      let source = resourceAsString(source_file);
+      
+      let compiled = parser.parse(source,{non_terminal:start_non_terminal,fileToString:resourceAsString,alert:console.log});
+
+      
+      saveStringResource(compiled_file, compiled, true);
+  }      
+  
   BNFT.noConflict = function () {
     root.mymodule = previous_BNFT;
     return BNFT;
@@ -1342,4 +1392,4 @@ document.write(bnft.parse("ABCD"));
     root.BNFT = BNFT;
   }
   
-}).call(this);
+}).apply(this,args);
