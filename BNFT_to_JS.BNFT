@@ -1,5 +1,5 @@
 alpha_char:
-"A".."Z"
+ "A".."Z"
  "a".."z"
 
 numeric_char:
@@ -15,70 +15,84 @@ alphanumeric_char:
  alpha_char
 
 any_char:
- "\\t" 
+ "\\\"" 
+ "\\\'" 
+ "\\t"
  "\\r" 
  "\\n" 
  "\\\\" 
- "\\\"" 
- "\\\’" 
  "#".."+"
  " " | "!"
  "(".."\0xFFFF"
  "\\0x" hexadecimal_char
  "\\0x" hexadecimal_char hexadecimal_char hexadecimal_char hexadecimal_char 
+ newline
+ whitespace
  
 whitespace:
- " "
- "\t"
+ " " | "\t"  { " " | "\t" }
 
-whitespaces:
- { whitespace }
+optwhitespace:
+ [ whitespace ] 
+
+newline:
+ "\r" | "\n" | ";" { " " | "\t" | "\r" | "\n" | ";" }
+
+optnewline:
+ [ newline ]
 
 identifier:
- alpha_char { alphanumeric_char | "_"} { whitespace }
+ alpha_char { alphanumeric_char | "_"}
 
 newline:
  "\r\n"
  "\n\r"
  "\r"
  "\n"
- ";"
+ 
 
 newlines:
- whitespaces newline whitespaces { newlines }
+ optwhitespace newline { optwhitespace newline }
  
 entry:
  identifier ":" newlines { definition newlines }    -> "this." identifier " = function () {" definition "}" 
- identifier whitespaces "=" definition newlines     -> "this." identifier " = function () {" definition "}"
+ identifier optwhitespace "=" definition newlines     -> "this." identifier " = function () {" definition "}"
 
 literal:
- "\"" { any_char } "\"" whitespaces [".." whitespaces "\"" { any_char } "\""]
- "\’" { any_char } "\’" whitespaces [".." whitespaces "\'" { any_char } "\'"]
+  "\"" { any_char } "\"" 
+  "\'" { any_char } "\'"
+
+range:
+ literal optwhitespace ".." literal
 
 output_literal:
- "\"" { any_char } "\"" whitespaces
- "\’" { any_char } "\’" whitespaces
+ "\"" { any_char } "\"" 
+ "\'" { any_char } "\'" 
 
 definition:
- expression [  {newline | whitespace} "->" {newline | whitespace} output]
+ expression [ optwhitespace "->" optwhitespace output]
 
 item:
+ range
  literal
  identifier
- "{" expression "}"
- "[" expression "]"
- "(" expression ")" 
+ "{" expression optwhitespace "}"
+ "[" expression optwhitespace "]"
+ "(" expression optwhitespace ")" 
 
 or_expression:
- whitespaces item { whitespaces "|"  or_expression }
+ optwhitespace item { optwhitespace "|"  or_expression }
 
 expression:
- whitespaces or_expression { whitespaces or_expression }
+ optwhitespace or_expression { optwhitespace or_expression }
+
+output_item:
+ "#indent" | "#block"
+ output_literal
+ identifier 
 
 output:
- "#indent" | "#block" [output]
- output_literal [output]
- identifier [output] 
+  output_item { whitespace output_item }
 
 body:
  { "#include" {whitespace} literal } 
@@ -112,7 +126,7 @@ script:
       // returns current char
       this.currentChar = function () {
         if (this.position >= this.source.length) {
-          return "";
+          return \"\";
         }
         return this.source.substring(this.position, this.position + 1);
       };
@@ -166,11 +180,11 @@ script:
 
       // inserts a string at mark
       this.insertFrom = function (mark, stringToInsert) {
-        this.source = source.substring(0, mark) + stringToInsert + "\n" + source.substring(this.position);
+        this.source = source.substring(0, mark) + stringToInsert + \"\n\" + source.substring(this.position);
         this.position = mark;
       };
     };
 
-    var tokenizer = new Tokenizer(source + "\n");
+    var tokenizer = new Tokenizer(source + \"\n\");
 ' body
 

@@ -11,13 +11,13 @@ newline:
 digit:
  "0".."9"
 number:
- [ "-" ] { digit } ["." {digit} ]
+ [ "-" ] { digit } [ "." { digit } ]
 alphachar:
  'a'..'z'
 name:
  alphachar { alphachar }
 function:
- "def" whitespace name whitespace newline body whitespace "end"  -> "function " name "() {\n" body "}\n"
+ "def" whitespace name whitespace newline body whitespace "end" -> "function " name "() \n" body "}\n"
 loop:
  "do" whitespace number whitespace newline body whitespace  "end"  -> "var i;\nfor (i = 0; i < " number ";i++) {\n" body "}\n"
 statement:
@@ -44,7 +44,7 @@ program:
     var lineLength = Math.sqrt( (Ax-Bx)*(Ax-Bx)+(Ay-By)*(Ay-By));
     var i;
     for (i = 0; i < lineLength; i++) {
-      doc +=\"<div style=\'position:absolute;left:\" + Math.round( Ax+(Bx-Ax)*i/lineLength  ) + \"px;top:\"+ Math.round( Ay+(By-Ay)*i/lineLength  ) +\"px;width:1px;height:1px;background:#000\'></div>\";
+      doc +=\"<div style='position:absolute;left:\" + Math.round( Ax+(Bx-Ax)*i/lineLength  ) + \"px;top:\"+ Math.round( Ay+(By-Ay)*i/lineLength  ) +\"px;width:1px;height:1px;background:#000'></div>\";
     }
   };
   function _forward (l) {
