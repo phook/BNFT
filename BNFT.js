@@ -1,16 +1,16 @@
 /*jslint nomen: true, plusplus: true, vars: true, indent: 2*/
-args = []
+let args = [];
 if (typeof(process) != "undefined") 
     args = process.argv;
+
 (function () {
 
   "use strict";
 
-  var root = this;
-  var previous_BNFT = root.BNFT;
+  let root = this;
+  let previous_BNFT = root.BNFT;
 
-
-  var BNFT = function (source,options) {
+  let BNFT = function (source,options) {
 
       if (options && typeof(options.fileToString) == "function")
       {
@@ -32,11 +32,11 @@ if (typeof(process) != "undefined")
 
       this.source = source;
       this.position = 0; // current position (or current peekposition if peeking)
-
+     
       this.lastPosition = 0;
       this.store_next_error = true;
       this.next_error = "";
-
+      
       this.peekPosition = []; // for storing current position when peeking
       this.indents = []; // for indents - significant whitespace
 
@@ -46,7 +46,7 @@ if (typeof(process) != "undefined")
 
       // returns next char and advances position
       this.nextChar = function () {
-        var result = this.currentChar();
+        let result = this.currentChar();
         this.next();
         return result;
       };
@@ -60,12 +60,11 @@ if (typeof(process) != "undefined")
             this.lastPosition = this.position;
         }
       };
-
       this.error = function(msg)
       {
         if (this.store_next_error)
             this.next_error = msg;
-      }
+      };
 
       // returns current char
       this.currentChar = function () {
@@ -92,6 +91,13 @@ if (typeof(process) != "undefined")
         }
       };
 
+      // pop/stop peeking
+      this.stopPeek = function () {
+        if (this.peeking()) {
+            this.peekPosition.pop();
+        }
+      };
+
       // checks for next token to be s and advances position
       this.nextIs = function (s, caseSensitive) {
 
@@ -113,7 +119,7 @@ if (typeof(process) != "undefined")
           return false;
         }
 
-        var match = this.source.substring(this.position, this.position + s.length);
+        let match = this.source.substring(this.position, this.position + s.length);
 
         if (caseSensitive) {
           return match === s;
@@ -138,7 +144,7 @@ if (typeof(process) != "undefined")
       this.next = null;
 
       this.add = function (item) {
-        var nextChain = this;
+        let nextChain = this;
         while (nextChain.next)
         {
             nextChain = nextChain.next;
@@ -148,8 +154,8 @@ if (typeof(process) != "undefined")
 	    
       this.find = function (identifier) {
 
-        var nextChain = this;
-        var result = "";
+        let nextChain = this;
+        let result = "";
 	      
         while (nextChain)
         {
@@ -162,8 +168,8 @@ if (typeof(process) != "undefined")
       };
 	    
       this.result = function() {
-        var nextChain = this;
-        var result = "";
+        let nextChain = this;
+        let result = "";
 	      
         while (nextChain)
         {
@@ -243,7 +249,7 @@ if (typeof(process) != "undefined")
           return null;
         }
 
-        var currentChar = this.owner.tokenizer.currentChar();
+        let currentChar = this.owner.tokenizer.currentChar();
         if (caseSensitive) {
           if (currentChar >= char1 && currentChar <= char2) {
             this.owner.tokenizer.next();
@@ -291,13 +297,21 @@ if (typeof(process) != "undefined")
       this.parse = function (terminator) {
 
         this.owner.tokenizer.peek();
-
-        if (this.arg1.parse(terminator) !== null) {
-          this.owner.tokenizer.unPeek();
-          return this.arg1.parse(terminator);
-        }
-
+/*
+        let result = this.arg1.parse(terminator);
+        if (result === null)
+            this.owner.tokenizer.unPeek();
+        else
+            this.owner.tokenizer.stopPeek();
+        
+        return result;
+        */
+        
+        let result = this.arg1.parse(terminator);
         this.owner.tokenizer.unPeek();
+        if (result !== null)
+          return this.arg1.parse(terminator);
+      
         return null;
       };
     };
@@ -328,21 +342,23 @@ if (typeof(process) != "undefined")
       this.isOptional = function () {
         return true;
       };
-
+   
       // parse a set of optional expressions
       this.parse = function (terminator) {
-        var result = null;
-        var test = null;
+        let result = null;
+        let test = null;
         while (true) {
           this.owner.tokenizer.peek();
           test = this.arg1.parse(terminator);
-          this.owner.tokenizer.unPeek();
+          
           if (test !== null) {
             if (result === null) {
               result = new this.owner.Result("", "");
             }
-            result.add(this.arg1.parse(terminator));
+            this.owner.tokenizer.stopPeek();
+            result.add(test);
           } else {
+            this.owner.tokenizer.unPeek();
             return result;
           }
 
@@ -357,6 +373,7 @@ if (typeof(process) != "undefined")
         }
         return null;
       };
+      
     };
 
     // Class OrExpression implements Expression
@@ -372,13 +389,13 @@ if (typeof(process) != "undefined")
 
       // override fold
       this.fold = function () {
-        var i = 0;
+        let i = 0;
         if (this.folded) {
           return;
         }
 
         this.folded = true;
-        var test = null;
+        let test = null;
         for (i = 0; i < this.arg.length; i++) {
           test = this.arg[i].isIdentifier();
           if (test !== null) {
@@ -391,7 +408,7 @@ if (typeof(process) != "undefined")
 
       // override since this might be optional
       this.isOptional = function () {
-        var i = 0;
+        let i = 0;
         for (i = 0; i < this.arg.length; i++) {
           if (this.arg[i].isOptional()) {
             return true;
@@ -402,8 +419,8 @@ if (typeof(process) != "undefined")
 
       // parse an Or Expression
       this.parse = function (terminator) {
-        var result = null;
-        var i = 0;
+        let result = null;
+        let i = 0;
         for (i = 0; i < this.arg.length; i++) {
           result = this.arg[i].parse(terminator);
           if (result !== null) {
@@ -421,12 +438,12 @@ if (typeof(process) != "undefined")
       owner.Expression.call(this);
       this.owner = owner;
       this.arg = [];
-      this.newOutputSpecification = [];
+      this.newOutputSpecification = null;
       this.indentate = false;
 
       // override since this might be optional
       this.isOptional = function () {
-        var i = 0;
+        let i = 0;
         for (i = 0; i < this.arg.length; i++) {
           if (!this.arg[i].isOptional()) {
             return false;
@@ -440,8 +457,8 @@ if (typeof(process) != "undefined")
         if (this.folded) {
           return;
         }
-        var i = 0;
-        var test = null;
+        let i = 0;
+        let test = null;
         this.folded = true;
         for (i = 0; i < this.arg.length; i++) {
           test = this.arg[i].isIdentifier();
@@ -455,16 +472,16 @@ if (typeof(process) != "undefined")
 
       // parse an And Expression
       this.parse = function (terminator) {
-        var mark = this.owner.tokenizer.position;
+        let mark = this.owner.tokenizer.position;
         if (this.indentate) {
           this.owner.indent++;
         }
-        var result = null;
+        let result = null;
         this.owner.tokenizer.peek();
-        var success = true;
-        var i, j = 0;
-        var intermediateResult = null;
-        var newTerminator = terminator;
+        let success = true;
+        let i, j = 0;
+        let intermediateResult = null;
+        let newTerminator = terminator;
         for (i = 0; i < this.arg.length; i++) {
           if (!this.arg[i].isOptional()) { // non optional elements does not have terminator
             intermediateResult = this.arg[i].parse(null);
@@ -501,10 +518,10 @@ if (typeof(process) != "undefined")
         }
 
         if (success && result !== null) {
-          this.owner.tokenizer.peekPosition.pop();
+          this.owner.tokenizer.stopPeek();
           if (this.newOutputSpecification !== null) {
             if (this.newOutputSpecification.length > 0) {
-              var concat = "", localEntry = "", nextEntry = "", fileToInclude = "";
+              let concat = "", localEntry = "", nextEntry = "", fileToInclude = "";
               for (i = 0; i < this.newOutputSpecification.length; i++) {
                 localEntry = this.newOutputSpecification[i];
                 if (localEntry.length > 0) {
@@ -527,7 +544,7 @@ if (typeof(process) != "undefined")
                       }
                     } else {
                         if (localEntry === "#decodeuri") {
-                          var escapeSequence = "";
+                          let escapeSequence = "";
                           if (i + 1 < this.newOutputSpecification.length) {
                             nextEntry = this.newOutputSpecification[i + 1];
                             escapeSequence = result.find(nextEntry);
@@ -540,7 +557,7 @@ if (typeof(process) != "undefined")
                           i = i + 1;
                         } else {
                             if (localEntry === "#encodeuri") {
-                              var escapeSequence = "";
+                              let escapeSequence = "";
                               if (i + 1 < this.newOutputSpecification.length) {
                                 nextEntry = this.newOutputSpecification[i + 1];
                                 escapeSequence = result.find(nextEntry);
@@ -588,7 +605,7 @@ if (typeof(process) != "undefined")
       // override since this might be identifier
       this.isIdentifier = function () {
         if (this.passThrough === null) {
-          var i;
+          let i;
           for (i = 0; i < this.owner.entry.length; i++) {
             if (this.owner.entry[i].nonterminal === identifier) {
               this.passThrough = this.owner.entry[i];
@@ -608,7 +625,7 @@ if (typeof(process) != "undefined")
       };
 
       this.parse = function (terminator) {
-        var result = null;
+        let result = null;
         if (this.isIdentifier() !== null) {
           result = this.passThrough.parse(terminator);
         }
@@ -644,7 +661,7 @@ if (typeof(process) != "undefined")
     };
 
     this._alpha_char = function () {
-      var currentChar = this.tokenizer.currentChar();
+      let currentChar = this.tokenizer.currentChar();
       if (currentChar.toLowerCase() >= "a" && currentChar.toLowerCase() <= "z") {
         this.lastChar = currentChar;
         this.tokenizer.next();
@@ -654,7 +671,7 @@ if (typeof(process) != "undefined")
     };
 
     this._numeric_char = function () {
-      var currentChar = this.tokenizer.currentChar();
+      let currentChar = this.tokenizer.currentChar();
       if (currentChar >= "0" && currentChar <= "9") {
         this.lastChar = currentChar;
         this.lastValue = parseInt(currentChar, 10);
@@ -675,7 +692,7 @@ if (typeof(process) != "undefined")
     };
 
     this._hexadecimal_char = function () {
-      var currentChar = this.tokenizer.currentChar();
+      let currentChar = this.tokenizer.currentChar();
       if ((currentChar.toLowerCase() >= "a" && currentChar.toLowerCase() <= "f") || (currentChar.toLowerCase() >= "0" && currentChar.toLowerCase() <= "9")) {
         this.lastChar = currentChar;
         this.lastValue = parseInt(currentChar, 16);
@@ -686,7 +703,7 @@ if (typeof(process) != "undefined")
     };
 
     this._any_char = function (report_error) {
-      var i;
+      let i;
       this.lastChar = this.tokenizer.nextChar();
       if (this.lastChar === "\\") {
         if (this.tokenizer.currentChar() === "\\") {
@@ -715,7 +732,7 @@ if (typeof(process) != "undefined")
           return true;
         }
         if (this.tokenizer.nextIs("0x")) {
-          var charValue = 0, result = "";
+          let charValue = 0, result = "";
           for (i = 0; i < 4; i++) {
             result = this._hexadecimal_char();
             if (!result) {
@@ -783,13 +800,13 @@ if (typeof(process) != "undefined")
 
     this._isnextnewline = function () {
       this.tokenizer.peek();
-      var result = this._newline();
+      let result = this._newline();
       this.tokenizer.unPeek();
       return result;
     };
 
     this._eat_whitespaces = function () {
-      var to_please_mr_crockford = true;
+      let to_please_mr_crockford = true;
       while (to_please_mr_crockford) {
         to_please_mr_crockford = this._whitespace();
       }
@@ -797,13 +814,13 @@ if (typeof(process) != "undefined")
 
     this._nextline = function () {
       this._eat_whitespaces();
-      var result = this._newline();
+      let result = this._newline();
       this._eat_whitespaces();
       return result;
     };
 
     this._advanceline = function () {
-      var result = false;
+      let result = false;
       while (this._nextline()) {
         result = true;
       }
@@ -823,7 +840,7 @@ if (typeof(process) != "undefined")
 
     this._entry = function (report_error) {
       if (this._identifier()) {
-        var localEntry = new this.OrExpression(this, this.lastIdentifier);
+        let localEntry = new this.OrExpression(this, this.lastIdentifier);
         if (this.tokenizer.nextIs(":")) {
           if (!this._nextline()) {
             return false;
@@ -865,7 +882,7 @@ if (typeof(process) != "undefined")
     };
 
     this._script = function () {
-      var mark = this.tokenizer.position;
+      let mark = this.tokenizer.position;
       if (this.tokenizer.nextIs("#include")) {
         if (!this.tokenizer.nextIs(" ")) {
           return false;
@@ -905,13 +922,13 @@ if (typeof(process) != "undefined")
     };
 
     this._literal = function (report_error) {
-      var literalEnclosing = this.tokenizer.currentChar();
+      let literalEnclosing = this.tokenizer.currentChar();
       if (literalEnclosing !== "\"" && literalEnclosing !== "'") {
         return false;
       }
       this.tokenizer.next();
-      var literal = "";
-      var enter = this.tokenizer.currentChar() === "\\";
+      let literal = "";
+      let enter = this.tokenizer.currentChar() === "\\";
       this._any_char(true);
       while (this.lastChar !== literalEnclosing || enter) {
         literal += this.lastChar;
@@ -930,7 +947,7 @@ if (typeof(process) != "undefined")
         if (!this.tokenizer.nextIs(literalEnclosing)) {
           return report_error || this.error(literalEnclosing + " expected");
         }
-        var secondLiteral = "";
+        let secondLiteral = "";
         enter = this.tokenizer.currentChar() === "\\";
         this._any_char(true);
         while (this.lastChar !== literalEnclosing || enter) {
@@ -957,13 +974,13 @@ if (typeof(process) != "undefined")
     };
 
     this._output_literal = function (report_error) {
-      var literalEnclosing = this.tokenizer.currentChar();
+      let literalEnclosing = this.tokenizer.currentChar();
       if (literalEnclosing !== "\"" && literalEnclosing !== "'") {
         return false;
       }
       this.tokenizer.next();
-      var literal = "";
-      var enter = this.tokenizer.currentChar() === "\\";
+      let literal = "";
+      let enter = this.tokenizer.currentChar() === "\\";
       this._any_char(true);
       while (this.lastChar !== literalEnclosing || enter) {
         literal += this.lastChar;
@@ -986,14 +1003,14 @@ if (typeof(process) != "undefined")
         return false;
       }
 
-      var result = this._advanceline();
+      let result = this._advanceline();
 
       if (this.tokenizer.nextIs("->")) {
         this._advanceline();
 
         this.lastIndentate = false;
         this.lastOutput = [];
-        var exp = this.lastExpression;
+        let exp = this.lastExpression;
 
         this._output();
 
@@ -1072,7 +1089,7 @@ if (typeof(process) != "undefined")
     };
 
     this._or_expression = function () {
-      var orExpression = null;
+      let orExpression = null;
 
       if (!this._item(true)) {
         return false;
@@ -1105,7 +1122,7 @@ if (typeof(process) != "undefined")
     this._expression = function () {
       this._eat_whitespaces();
 
-      var andExpression = null;
+      let andExpression = null;
 
       if (!this._or_expression()) {
         return false;
@@ -1218,11 +1235,11 @@ if (typeof(process) != "undefined")
         this.errorPosition = this.tokenizer.position;
         this.errorMessage = "Unknown error " + message;
       }
-      var pos1 = this.errorPosition;
+      let pos1 = this.errorPosition;
       while (pos1 > 0 && this.tokenizer.source[pos1] !== '\n') {
         pos1--;
       }
-      var pos2 = this.errorPosition;
+      let pos2 = this.errorPosition;
       while (pos2 < this.tokenizer.source.length && this.tokenizer.source[pos2] !== '\n') {
         pos2++;
       }
@@ -1235,31 +1252,25 @@ if (typeof(process) != "undefined")
       return message;
     };
 
-      if (!this._script()) {
-        if (typeof(options.alert) == "function")
-			options.alert(this.errorFormatting("BNFT Source parse fail")); // ERROR REPORTING
-        return "ERROR";
-      }
-
     this.significantWhitespace = function (source, blockbegin, blockend, noindents) {
       this.noindents = noindents;
-      var indents = function (size) {
+      let indents = function (size) {
         if (noindents) {
           return "";
         }
-        var result = "";
-        var i = 0;
+        let result = "";
+        let i = 0;
         for (i = 0; i < size; i++) {
           result += " ";
         }
         return result;
       };
-      var newsource = "";
-      var spaces = 0;
-      var indent = false;
-      var currentlevel = [0];
-      var i = 0;
-      var chr = "";
+      let newsource = "";
+      let spaces = 0;
+      let indent = false;
+      let currentlevel = [0];
+      let i = 0;
+      let chr = "";
       for (i = 0; i < source.length; i++) {
         chr = source[i];
         if (chr === " ") {
@@ -1308,7 +1319,7 @@ if (typeof(process) != "undefined")
       if (this.lastExpression !== null) {
         this.errorPosition = -1;
         this.lastExpression.fold();
-        var start_non_terminal = this.lastExpression;
+        let start_non_terminal = this.lastExpression;
         if (options && typeof(options.fileToString) == "function")
         {
             this.fileToString = options.fileToString;
@@ -1316,7 +1327,7 @@ if (typeof(process) != "undefined")
         if (options && typeof(options.nonterminal) == "string")
         {
             start_non_terminal = null;
-              for(var i in this.entry)
+              for(let i in this.entry)
               {
                   if (this.entry[i].nonterminal === options.nonterminal)
                   {
@@ -1335,18 +1346,18 @@ if (typeof(process) != "undefined")
         if (start_non_terminal.blockBegin)
             source = this.significantWhitespace(source, start_non_terminal.blockBegin, start_non_terminal.blockEnd, start_non_terminal.indentType);
         this.tokenizer = new this.Tokenizer(source);
-        var result = start_non_terminal.parse();
+        let result = start_non_terminal.parse();
         if (result !== null) {
           if (this.tokenizer.position !== this.tokenizer.source.length)
           {
             // parsing not finished
             let startpoint = this.tokenizer.lastPosition;
             while (startpoint > 0 && this.tokenizer.source[startpoint] !== "\n") startpoint--;
-            let endpoint = this.tokenizer.lastPosition;
+            let endpoint = this.tokenizer.lastPosition + 1;
             while (endpoint < this.tokenizer.source.length && this.tokenizer.source[endpoint] !== "\n") endpoint++;
             return "ERROR: " + this.tokenizer.next_error + this.tokenizer.source.substring(startpoint,endpoint);
            }
-          return result.result();
+           return result.result();
         }
         if (options && typeof(options.alert) == "function")
           options.alert(this.errorFormatting("BNFT parse fail"));
@@ -1357,11 +1368,18 @@ if (typeof(process) != "undefined")
       return "ERROR";
     };
 
+      if (!this._script()) {
+        if (typeof(options.alert) == "function")
+			options.alert(this.errorFormatting("BNFT Source parse fail")); // ERROR REPORTING
+        return "ERROR";
+      }
+
+
   };
 
 /* SIMPLE TEST
 
-var bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
+let bnft = new BNFT('allcharacters = \'A\'..\'Z\'->"!"\nfoo={allcharacters}');
 document.write(bnft.parse("ABCD"));
 
 */
@@ -1373,12 +1391,12 @@ document.write(bnft.parse("ABCD"));
         });
         else
             console.log("file exists");
-    }
+    };
     let resourceAsString = function(url)
     {
         const fs = require("fs");
-        return fs.readFileSync(url, {option:'utf8', function(err, source) {console.log("error reading "+filename);throw err;}}).toString();
-    }
+        return fs.readFileSync(url, {option:'utf8', function(err, source) {console.log("error reading "+url);throw err;}}).toString();
+    };
 
 
   if (typeof arguments[2] != "undefined")
@@ -1398,11 +1416,39 @@ document.write(bnft.parse("ABCD"));
       
       saveStringResource(compiled_file, compiled, true);
   }      
-  
+
   BNFT.noConflict = function () {
     root.mymodule = previous_BNFT;
     return BNFT;
   };
+
+  BNFT.async_BNFT = async function(source, options)
+  {
+      let cacheOptions = {};
+      let cache = {};
+      Object.assign(cacheOptions, options);
+      
+      cacheOptions.fileToString = function(url)
+      {
+          return cache[url];
+      }
+      
+      async function cacheFetch(url,options) 
+      {
+        var source = await options.fileToString(options.path + url);
+        cache[options.path + url] = source;
+      }
+      
+      let includesRegex = /#include *"(.*)"/g;
+      let matches;
+      let promises = [];
+      while (matches = includesRegex.exec(source)) {
+       promises.push(cacheFetch(matches[1],options));   
+      }
+      await Promise.all(promises);
+      return new BNFT(source,cacheOptions);
+  }
+
 
   if (typeof exports !== "undefined") {
     if (typeof module !== "undefined" && module.exports) {
@@ -1413,4 +1459,4 @@ document.write(bnft.parse("ABCD"));
     root.BNFT = BNFT;
   }
   
-}).apply(this,args);
+}).call(this);
