@@ -17,7 +17,7 @@ alphachar:
 name:
  alphachar { alphachar }
 function:
- "def" whitespace name whitespace newline body whitespace "end" -> "function " name "() \n" body "}\n"
+ "def" whitespace name whitespace newline body whitespace "end" -> "function " name "()\n{\n" body "}\n"
 loop:
  "do" whitespace number whitespace newline body whitespace  "end"  -> "var i;\nfor (i = 0; i < " number ";i++) {\n" body "}\n"
 statement:
