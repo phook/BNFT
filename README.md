@@ -11,7 +11,7 @@ What BNFT adds to the BNF notation is the Transformation part. Conceptually all 
 
 BNFT Testbed
 ------------
-Try out BNFT [here](http://jsfiddle.net/phook/h8evd5bj/embedded/result)
+Try out BNFT [here](https://jsfiddle.net/phook/h8evd5bj/embedded/result)
 
 The Testbed sports 4 subwindows, with the BNFT source code, a sample input to run through the BNFT transformation, an output window and a console for error messages and optional console output from running programs. Buttons allow for translating input and running the output - provided it is written in javascript format.
 
